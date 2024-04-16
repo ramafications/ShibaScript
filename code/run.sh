@@ -1,17 +1,17 @@
 #!/bin/bash
 #!/bin/bash
-source /opt/anaconda3/bin/activate
+source  /opt/anaconda3/bin/activate Shiba
 
-DATA_DIR=$1
-NAME=$2
+DATA_DIR=/Users/ramadas/ShibaScript/code/Finn
+NAME=Finn.mp4
 ORIGIN_DIR=`pwd`
 # 1. raw panns to get "sentence"
 echo "step 1. raw panns to get sentence"
-cd ~/Ani/AudioTagging/audioset_tagging_cnn
+cd ~/ShibaScript/code/AudioTagging/audoset_tagging_cnn
 LOG_PATH=${DATA_DIR}/log.txt
 
 
-python pytorch/process_shiba.py sound_event_detection --log_file ${LOG_PATH} --model_type Cnn14_DecisionLevelMax --checkpoint_path ~/panns_data/Cnn14_DecisionLevelMax.pth --file_path ~/${NAME}/ --wav_path ~/${NAME}/ --cuda
+python3 pytorch/process_shiba.py sound_event_detection --log_file ${LOG_PATH} --model_type Cnn14_DecisionLevelMax --checkpoint_path ~/panns_data/Cnn14_DecisionLevelMax.pth --file_path ~/${NAME}/ --wav_path ~/${NAME}/ --cuda
 
 # 2. process the result of panns
 echo "step 2. process the result of panns"
@@ -23,17 +23,17 @@ if [ ! -d ${SAVE_PATH} ];then
     mkdir ${SAVE_PATH}
 fi
 
-python process_pannsresult.py --log_path ${LOG_PATH} --save_path ${SAVE_PATH} --audio_path ~/${NAME}/
+python3 process_pannsresult.py --log_path ${LOG_PATH} --save_path ${SAVE_PATH} --audio_path ~/${NAME}/
 
 # 4. remove those noise
 echo "step 3. remove noise"
-cd ~/Ani/AudioTagging/audioset_tagging_cnn
+cd ~/ShibaScript/code/AudioTagging/audoset_tagging_cnn
 python pytorch/process_noiseremover.py sound_event_detection --model_type Cnn14_DecisionLevelMax --checkpoint_path /home/jieyi/panns_data/Cnn14_DecisionLevelMax.pth --file_path ${SAVE_PATH} --cuda
 
 
 # 3. automatically generate sentence->word
 echo "step 4. automatically generate sentence to word"
-cd ~/Ani/code/CutRawClips/
+cd ~/ShibaScript/code/CutRawClips/
 OUT_DIR_AUTO=~/Ani/code/CutRawClips/result_${NAME}.txt
 SAVE_PATH_WORD=${DATA_DIR}/words/
 if [ ! -d ${SAVE_PATH_WORD} ];then
@@ -41,8 +41,8 @@ if [ ! -d ${SAVE_PATH_WORD} ];then
 fi 
 
 conda activate maskrcnn_benchmark
-python inference.py --out_dir ${OUT_DIR_AUTO} --audio_path ${SAVE_PATH}
-python processresult.py --audio_path ${SAVE_PATH} --save_path ${SAVE_PATH_WORD} --result_file ${OUT_DIR_AUTO}
+python3 inference.py --out_dir ${OUT_DIR_AUTO} --audio_path ${SAVE_PATH}
+python3 processresult.py --audio_path ${SAVE_PATH} --save_path ${SAVE_PATH_WORD} --result_file ${OUT_DIR_AUTO}
 conda deactivate
 
 
@@ -53,7 +53,7 @@ if [ ! -d ${SAVE_PATH_SYLLABLES} ];then
     mkdir ${SAVE_PATH_SYLLABLES}
 fi
 cd ${ORIGIN_DIR}
-python cutSyllables.py --wav_path ${SAVE_PATH_WORD} --res_out_root ${SAVE_PATH_SYLLABLES} --segment_info_path ${DATA_DIR}/log_segment.txt
+python3 cutSyllables.py --wav_path ${SAVE_PATH_WORD} --res_out_root ${SAVE_PATH_SYLLABLES} --segment_info_path ${DATA_DIR}/log_segment.txt
 
 # 6. feature extraction
 echo "step 6. feature extraction"
@@ -65,5 +65,5 @@ if [ ! -d ${FEATURE_PATH} ];then
 fi
 
 conda activate shennong
-python generate_filterbank.py --data_path ${SAVE_PATH_SYLLABLES} --ref_path ${SAVE_PATH_WORD} --save_path ${FEATURE_PATH}
+python3 generate_filterbank.py --data_path ${SAVE_PATH_SYLLABLES} --ref_path ${SAVE_PATH_WORD} --save_path ${FEATURE_PATH}
 conda deactivate

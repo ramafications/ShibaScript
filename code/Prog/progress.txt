@@ -1,0 +1,9 @@
+deleted opt directory in order to redownload anaconda
+changed run.sh file in order to acess Finn directory and the mp4 file using the pwd
+gave execution permissions to run.sh
+renaming paths in my run.sh file to reflect the correct paths on my local device
+downloading all the required python modules in the environment(numoy, librsoa)
+not using conda variables, for some reason
+had to deactivate all running enviroments
+y
+
